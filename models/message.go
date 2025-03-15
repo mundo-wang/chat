@@ -18,7 +18,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// 消息
+//消息
 type Message struct {
 	gorm.Model
 	UserId     int64  //发送者
@@ -52,13 +52,13 @@ type Node struct {
 	GroupSets     set.Interface   //好友 / 群
 }
 
-// 映射关系
+//映射关系
 var clientMap map[int64]*Node = make(map[int64]*Node, 0)
 
-// 读写锁
+//读写锁
 var rwLocker sync.RWMutex
 
-// 需要 ：发送者ID ，接受者ID ，消息类型，发送的内容，发送类型
+//	需要 ：发送者ID ，接受者ID ，消息类型，发送的内容，发送类型
 func Chat(writer http.ResponseWriter, request *http.Request) {
 	//1.  获取参数 并 检验 token 等合法性
 	//token := query.Get("token")
@@ -156,7 +156,7 @@ func init() {
 	fmt.Println("init goroutine ")
 }
 
-// 完成udp数据发送协程
+//完成udp数据发送协程
 func udpSendProc() {
 	con, err := net.DialUDP("udp", nil, &net.UDPAddr{
 		IP:   net.IPv4(192, 168, 0, 255),
@@ -180,7 +180,7 @@ func udpSendProc() {
 
 }
 
-// 完成udp数据接收协程
+//完成udp数据接收协程
 func udpRecvProc() {
 	con, err := net.ListenUDP("udp", &net.UDPAddr{
 		IP:   net.IPv4zero,
@@ -202,7 +202,7 @@ func udpRecvProc() {
 	}
 }
 
-// 后端调度逻辑处理
+//后端调度逻辑处理
 func dispatch(data []byte) {
 	msg := Message{}
 	msg.CreateTime = uint64(time.Now().Unix())
@@ -297,12 +297,12 @@ func sendMsg(userId int64, msg []byte) {
 	fmt.Println(ress)
 }
 
-// 需要重写此方法才能完整的msg转byte[]
+//需要重写此方法才能完整的msg转byte[]
 func (msg Message) MarshalBinary() ([]byte, error) {
 	return json.Marshal(msg)
 }
 
-// 获取缓存里面的消息
+//获取缓存里面的消息
 func RedisMsg(userIdA int64, userIdB int64, start int64, end int64, isRev bool) []string {
 	rwLocker.RLock()
 	//node, ok := clientMap[userIdA]
@@ -341,13 +341,13 @@ func RedisMsg(userIdA int64, userIdB int64, start int64, end int64, isRev bool) 
 	return rels
 }
 
-// 更新用户心跳
+//更新用户心跳
 func (node *Node) Heartbeat(currentTime uint64) {
 	node.HeartbeatTime = currentTime
 	return
 }
 
-// 清理超时连接
+//清理超时连接
 func CleanConnection(param interface{}) (result bool) {
 	result = true
 	defer func() {
@@ -368,7 +368,7 @@ func CleanConnection(param interface{}) (result bool) {
 	return result
 }
 
-// 用户心跳是否超时
+//用户心跳是否超时
 func (node *Node) IsHeartbeatTimeOut(currentTime uint64) (timeout bool) {
 	if node.HeartbeatTime+viper.GetUint64("timeout.HeartbeatMaxTime") <= currentTime {
 		fmt.Println("心跳超时。。。自动下线", node)

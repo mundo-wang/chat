@@ -8,6 +8,7 @@
             }
         })
     }
+
     //上传图片 创建群
     function uploadthis(dom) {
         uploadfile("attach/upload", dom, function (res) {
@@ -17,6 +18,7 @@
             }
         })
     }
+
     //维护用户头像
     function uploadUserInfo(dom) {
         uploadfile("attach/upload", dom, function (res) {
@@ -28,10 +30,10 @@
     }
 
 
-
     function userId() {
         return parseInt(util.parseQuery("userId"))
     }
+
     var app = new Vue(
         {
             el: "#pageapp",
@@ -74,7 +76,7 @@
                         "pkgids": ["mkgif", "emoj"]
                     },
                     packages: [],
-                    choosed: { "pkgid": "emoj", "assets": [], "size": "small" }
+                    choosed: {"pkgid": "emoj", "assets": [], "size": "small"}
                 },
                 msglist: [],
                 isReadRedisMsg: [],  //是否已读取某个用户的缓存消息
@@ -187,7 +189,7 @@
 
                     this.duration = new Date().getTime();
                     //video 摄像头   ，audio 音频
-                    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+                    navigator.mediaDevices.getUserMedia({audio: true, video: false})
                         .then(function (stream) {
                             this.showprocess = true
                             this.recorder = new MediaRecorder(stream);
@@ -205,12 +207,11 @@
                                 this.showprocess = false
                             }
                             this.recorder.start();
-                        }.bind(this)).
-                        catch(function (err) {
-                            console.log(err)
-                            mui.toast(err)
-                            this.showprocess = false
-                        }.bind(this));
+                        }.bind(this)).catch(function (err) {
+                        console.log(err)
+                        mui.toast(err)
+                        this.showprocess = false
+                    }.bind(this));
                 },
                 stoprecorder: function () {
                     if (typeof this.recorder.stop == "function") {
@@ -268,8 +269,7 @@
                 showmsg: function (user, msg, isReverse, isFirst) {
                     //console.log(">>>>>>>>>>>", user)
                     // console.log(">>>>>>>>>>>", msg)
-                    var data = {
-                    }
+                    var data = {}
                     data.ismine = userId() == msg.userId;
                     //console.log(data.ismine,userId(),msg.userid)
                     data.user = user;
@@ -299,7 +299,6 @@
                         } else {
                             document.querySelector("#convo .mui-scroll").style.transform = 'translateY(' + 0 + 'px)';
                         }
-
 
 
                         clearTimeout(that.timer)
@@ -363,7 +362,13 @@
                     if (this.isDisable) {
                         //首次读取某个用户的消息记录
                         if (this.isReadRedisMsg.filter(item => item === user.ID).length <= 0) {
-                            post("user/redisMsg", { userIdA: userId(), userIdB: user.ID, start: this.start, end: this.end, isRev: false }, function (res) {
+                            post("user/redisMsg", {
+                                userIdA: userId(),
+                                userIdB: user.ID,
+                                start: this.start,
+                                end: this.end,
+                                isRev: false
+                            }, function (res) {
                                 //循环读取的消息记录 并显示
                                 for (var i in res.Total) {
                                     this.showmsg(user, JSON.parse(res.Total[i]), false, true)
@@ -396,7 +401,13 @@
                                     this.isLoadMore = true;
                                     this.start = this.end + 1;
                                     this.end = this.end + 2;
-                                    post("user/redisMsg", { userIdA: userId(), userIdB: user.ID, start: this.start, end: this.end, isRev: false }, function (res) {
+                                    post("user/redisMsg", {
+                                        userIdA: userId(),
+                                        userIdB: user.ID,
+                                        start: this.start,
+                                        end: this.end,
+                                        isRev: false
+                                    }, function (res) {
                                         //循环读取的消息记录 并显示
                                         for (var i in res.Total) {
                                             this.showmsg(user, JSON.parse(res.Total[i]), true)
@@ -426,7 +437,7 @@
                     console.log(">>>> " + userid)
                     var userinfo = this.usermap[userid];
                     if (!userinfo) {
-                        post("user/find", { userId: parseInt(userid) }, function (res) {
+                        post("user/find", {userId: parseInt(userid)}, function (res) {
                             cb(res.Data);
                             this.usermap[userid] = res.Data;
                         }.bind(this))
@@ -486,7 +497,7 @@
                 },
                 loadfriends: function () {
                     var that = this;
-                    post("searchFriends", { userId: userId() }, function (res) {
+                    post("searchFriends", {userId: userId()}, function (res) {
                         that.friends = res.Rows || [];
                         var usermap = this.usermap;
                         for (var i in res.Rows) {
@@ -498,7 +509,7 @@
                 },
                 loadcommunitys: function () {
                     var that = this;
-                    post("contact/loadcommunity", { ownerId: userId() }, function (res) {
+                    post("contact/loadcommunity", {ownerId: userId()}, function (res) {
                         that.communitys = res.Rows || [];
                     })
                 },
@@ -527,7 +538,7 @@
                         this.setTimeFlag()
                         //console.log("_addfriend....")
                         var that = this
-                        post("contact/addfriend", { targetName: dstobj, userId: userId() }, function (res) {
+                        post("contact/addfriend", {targetName: dstobj, userId: userId()}, function (res) {
                             if (res.Code == 0) {
                                 mui.toast("添加成功");
                                 that.loadfriends();
@@ -587,7 +598,6 @@
                 },
 
 
-
                 //回到聊天首页
                 goBack() {
                     this.win = "main"
@@ -598,7 +608,7 @@
                         this.setTimeFlag();
                         var that = this;
                         console.log(that);
-                        post("contact/joinGroup", { comId: dstobj, "userId": userId() }, function (res) {
+                        post("contact/joinGroup", {comId: dstobj, "userId": userId()}, function (res) {
                             if (res.Code == 0) {
                                 mui.toast("添加成功");
 
